@@ -124,6 +124,39 @@ summary(totStepsbyDay$totSteps)
 
 ## What is the average daily activity pattern?
 
+- The time series plot of the average number of steps taken
+
+
+
+```r
+mSteps <- Dat %>%
+    group_by(interval) %>%
+    summarise_at(vars(steps), list(meanSteps = sum), na.rm = TRUE)
+meanSteps <- as.data.frame(mSteps)
+head(meanSteps)
+```
+
+```
+##   interval meanSteps
+## 1        0        91
+## 2        5        18
+## 3       10         7
+## 4       15         8
+## 5       20         4
+## 6       25       111
+```
+
+```r
+maxPos <- which.max(meanSteps$meanSteps)
+maxIntv <- meanSteps[maxPos, 1]
+with(meanSteps, plot(x = interval, y = meanSteps, type = "l", 
+    xlab = "5-minute interval", ylab = "Average number of steps", main = "Average daily activity pattern"))
+abline(v = maxIntv, col = "red")
+```
+
+![](Project1_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+- The maximum 5-minute interval is at 835 and the value is 10927. 
 
 
 ## Imputing missing values
