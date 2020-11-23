@@ -30,6 +30,36 @@ library("dplyr")
 
 ```r
 library("ggplot2")
+library("Hmisc")
+```
+
+```
+## Loading required package: lattice
+```
+
+```
+## Loading required package: survival
+```
+
+```
+## Loading required package: Formula
+```
+
+```
+## 
+## Attaching package: 'Hmisc'
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     src, summarize
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     format.pval, units
 ```
 
 ## Loading and preprocessing the data
@@ -127,7 +157,6 @@ summary(totStepsbyDay$totSteps)
 - The time series plot of the average number of steps taken
 
 
-
 ```r
 mSteps <- Dat %>%
     group_by(interval) %>%
@@ -150,7 +179,8 @@ head(meanSteps)
 maxPos <- which.max(meanSteps$meanSteps)
 maxIntv <- meanSteps[maxPos, 1]
 with(meanSteps, plot(x = interval, y = meanSteps, type = "l", 
-    xlab = "5-minute interval", ylab = "Average number of steps", main = "Average daily activity pattern"))
+    xlab = "5-minute interval", ylab = "Average number of steps", 
+    main = "Average daily activity pattern"))
 abline(v = maxIntv, col = "red")
 ```
 
@@ -158,9 +188,64 @@ abline(v = maxIntv, col = "red")
 
 - The maximum 5-minute interval is at 835 and the value is 10927. 
 
-
 ## Imputing missing values
+
+- impute steps with mean value using r "Hmisc" package
+
+
+```r
+Dat$imputedSteps <- with(Dat, impute(steps, mean))
+head(Dat)
+```
+
+```
+##   steps       date interval imputedSteps
+## 1    NA 2012-10-01        0      37.3826
+## 2    NA 2012-10-01        5      37.3826
+## 3    NA 2012-10-01       10      37.3826
+## 4    NA 2012-10-01       15      37.3826
+## 5    NA 2012-10-01       20      37.3826
+## 6    NA 2012-10-01       25      37.3826
+```
+
+- Aggregation total steps according to day using imputed data
+
+
+```r
+totSteps_I <- Dat %>%
+    group_by(date) %>%
+    summarise_at(vars(imputedSteps), list(totSteps = sum), na.rm = TRUE)
+totStepsbyDay_I <- as.data.frame(totSteps_I)
+head(totStepsbyDay_I)
+```
+
+```
+##         date totSteps
+## 1 2012-10-01 10766.19
+## 2 2012-10-02   126.00
+## 3 2012-10-03 11352.00
+## 4 2012-10-04 12116.00
+## 5 2012-10-05 13294.00
+## 6 2012-10-06 15420.00
+```
+
+- Histogram of the total number of steps taken each day using imputed data
+
+
+```r
+hist(totStepsbyDay_I$totSteps, xlab = "Total Steps per Dat", 
+     main = "Histogram of the total number of steps taken each day using imputed data")
+```
+
+![](Project1_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+
+
+
+
+

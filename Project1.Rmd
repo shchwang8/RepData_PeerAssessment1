@@ -9,6 +9,7 @@ output:
 ```{r}
 library("dplyr")
 library("ggplot2")
+library("Hmisc")
 
 ```
 
@@ -60,7 +61,6 @@ summary(totStepsbyDay$totSteps)
 
 - The time series plot of the average number of steps taken
 
-
 ```{r echo = TRUE, fig.width = 10}
 mSteps <- Dat %>%
     group_by(interval) %>%
@@ -70,16 +70,49 @@ head(meanSteps)
 maxPos <- which.max(meanSteps$meanSteps)
 maxIntv <- meanSteps[maxPos, 1]
 with(meanSteps, plot(x = interval, y = meanSteps, type = "l", 
-    xlab = "5-minute interval", ylab = "Average number of steps", main = "Average daily activity pattern"))
+    xlab = "5-minute interval", ylab = "Average number of steps", 
+    main = "Average daily activity pattern"))
 abline(v = maxIntv, col = "red")
 
 ```
 
 - The maximum 5-minute interval is at `r maxIntv` and the value is `r meanSteps[maxPos, 2]`. 
 
-
 ## Imputing missing values
+
+- impute steps with mean value using r "Hmisc" package
+
+```{r echo = TRUE}
+Dat$imputedSteps <- with(Dat, impute(steps, mean))
+head(Dat)
+
+```
+
+- Aggregation total steps according to day using imputed data
+
+```{r echo = TRUE}
+totSteps_I <- Dat %>%
+    group_by(date) %>%
+    summarise_at(vars(imputedSteps), list(totSteps = sum), na.rm = TRUE)
+totStepsbyDay_I <- as.data.frame(totSteps_I)
+head(totStepsbyDay_I)
+
+```
+
+- Histogram of the total number of steps taken each day using imputed data
+
+```{r echo = TRUE, fig.width = 8}
+hist(totStepsbyDay_I$totSteps, xlab = "Total Steps per Dat", 
+     main = "Histogram of the total number of steps taken each day using imputed data")
+```
 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+
+
+
+
+
