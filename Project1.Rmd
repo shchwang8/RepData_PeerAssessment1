@@ -25,7 +25,8 @@ str(Dat)
 
 ```
 ## What is mean total number of steps taken per day?
-### Aggregation total steps according to day
+
+- Aggregation total steps according to day
 ```{r totStep, echo = TRUE}
 totSteps <- Dat %>%
     group_by(date) %>%
@@ -34,7 +35,7 @@ totStepsbyDay <- as.data.frame(totSteps)
 head(totStepsbyDay)
 
 ```
-### Draw a graph to show the total number of steps for each day
+- Draw a graph to show the total number of steps for each day
 ```{r totGraph, echo = TRUE, fig.width = 8}
 g <- ggplot(data = totStepsbyDay, aes(x= date, y = totSteps))
 g <- g + geom_bar(stat = "identity", color="blue", fill="steelblue")
@@ -42,7 +43,13 @@ g + ylab("Total Steps") + xlab("")
 
 ```
 
-### Mean and median of the total number of steps taken per day:  `r as.integer(mean(totStepsbyDay$totSteps))` and `r as.integer(median(totStepsbyDay$totSteps))`
+- Histogram of the total number of steps taken each day
+```{r echo = TRUE, fig.width = 8}
+hist(totStepsbyDay$totSteps, xlab = "Total Steps per Dat", main = "Histogram of the total number of steps taken each day")
+
+```
+
+- Mean and median of the total number of steps taken per day:  `r as.integer(mean(totStepsbyDay$totSteps))` and `r as.integer(median(totStepsbyDay$totSteps))`
 
 ```{r meanMD, echo = TRUE}
 summary(totStepsbyDay$totSteps)
