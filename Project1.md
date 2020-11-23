@@ -62,6 +62,10 @@ library("Hmisc")
 ##     format.pval, units
 ```
 
+```r
+library("timeDate")
+```
+
 ## Loading and preprocessing the data
 
 ```r
@@ -160,19 +164,19 @@ summary(totStepsbyDay$totSteps)
 ```r
 mSteps <- Dat %>%
     group_by(interval) %>%
-    summarise_at(vars(steps), list(meanSteps = sum), na.rm = TRUE)
+    summarise_at(vars(steps), list(meanSteps = mean), na.rm = TRUE)
 meanSteps <- as.data.frame(mSteps)
 head(meanSteps)
 ```
 
 ```
 ##   interval meanSteps
-## 1        0        91
-## 2        5        18
-## 3       10         7
-## 4       15         8
-## 5       20         4
-## 6       25       111
+## 1        0 1.7169811
+## 2        5 0.3396226
+## 3       10 0.1320755
+## 4       15 0.1509434
+## 5       20 0.0754717
+## 6       25 2.0943396
 ```
 
 ```r
@@ -186,7 +190,7 @@ abline(v = maxIntv, col = "red")
 
 ![](Project1_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
-- The maximum 5-minute interval is at 835 and the value is 10927. 
+- The maximum 5-minute interval is at 835 and the value is 206. 
 
 ## Imputing missing values
 
@@ -239,9 +243,84 @@ hist(totStepsbyDay_I$totSteps, xlab = "Total Steps per Dat",
 
 ![](Project1_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
-
-
 ## Are there differences in activity patterns between weekdays and weekends?
+
+- Add a logic weekend column
+
+
+```r
+Dat$Weekend <- isWeekend(Dat$date, wday = 1:5)
+head(Dat)
+```
+
+```
+##   steps       date interval imputedSteps Weekend
+## 1    NA 2012-10-01        0      37.3826   FALSE
+## 2    NA 2012-10-01        5      37.3826   FALSE
+## 3    NA 2012-10-01       10      37.3826   FALSE
+## 4    NA 2012-10-01       15      37.3826   FALSE
+## 5    NA 2012-10-01       20      37.3826   FALSE
+## 6    NA 2012-10-01       25      37.3826   FALSE
+```
+
+- Aggregate mean steps for both week day and week end
+
+
+```r
+mSteps_wkDay <- Dat %>%
+    filter(Weekend == FALSE) %>%
+    group_by(interval) %>%
+    summarise_at(vars(steps), list(meanSteps = mean), na.rm = TRUE)
+meanSteps_wkDay <- as.data.frame(mSteps_wkDay)
+head(meanSteps_wkDay)
+```
+
+```
+##   interval meanSteps
+## 1        0 2.3333333
+## 2        5 0.4615385
+## 3       10 0.1794872
+## 4       15 0.2051282
+## 5       20 0.1025641
+## 6       25 1.5128205
+```
+
+```r
+mSteps_wkEnd <- Dat %>%
+    filter(Weekend == TRUE) %>%
+    group_by(interval) %>%
+    summarise_at(vars(steps), list(meanSteps = mean), na.rm = TRUE)
+meanSteps_wkEnd <- as.data.frame(mSteps_wkEnd)
+head(meanSteps_wkEnd)
+```
+
+```
+##   interval meanSteps
+## 1        0  0.000000
+## 2        5  0.000000
+## 3       10  0.000000
+## 4       15  0.000000
+## 5       20  0.000000
+## 6       25  3.714286
+```
+
+- Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
+
+
+```r
+rng <- range(meanSteps_wkDay$meanSteps, meanSteps_wkEnd$meanSteps)
+par(mfrow = c(1, 2))
+with(meanSteps_wkDay, plot(x = interval, y = meanSteps, type = "l", ylim = rng, 
+                           xlab = "5-minute interval", ylab = "Average number of steps", 
+                           main = "Average daily activity pattern in week day"))
+with(meanSteps_wkEnd, plot(x = interval, y = meanSteps, type = "l", ylim = rng, 
+                           xlab = "5-minute interval", ylab = "Average number of steps", 
+                           main = "Average daily activity pattern in week end"))
+```
+
+![](Project1_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
+
 
 
 

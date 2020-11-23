@@ -10,6 +10,7 @@ output:
 library("dplyr")
 library("ggplot2")
 library("Hmisc")
+library("timeDate")
 
 ```
 
@@ -64,7 +65,7 @@ summary(totStepsbyDay$totSteps)
 ```{r echo = TRUE, fig.width = 10}
 mSteps <- Dat %>%
     group_by(interval) %>%
-    summarise_at(vars(steps), list(meanSteps = sum), na.rm = TRUE)
+    summarise_at(vars(steps), list(meanSteps = mean), na.rm = TRUE)
 meanSteps <- as.data.frame(mSteps)
 head(meanSteps)
 maxPos <- which.max(meanSteps$meanSteps)
@@ -76,7 +77,7 @@ abline(v = maxIntv, col = "red")
 
 ```
 
-- The maximum 5-minute interval is at `r maxIntv` and the value is `r meanSteps[maxPos, 2]`. 
+- The maximum 5-minute interval is at `r maxIntv` and the value is `r as.integer(meanSteps[maxPos, 2])`. 
 
 ## Imputing missing values
 
@@ -106,9 +107,49 @@ hist(totStepsbyDay_I$totSteps, xlab = "Total Steps per Dat",
      main = "Histogram of the total number of steps taken each day using imputed data")
 ```
 
-
-
 ## Are there differences in activity patterns between weekdays and weekends?
+
+- Add a logic weekend column
+
+```{r echo = TRUE}
+Dat$Weekend <- isWeekend(Dat$date, wday = 1:5)
+head(Dat)
+
+```
+
+- Aggregate mean steps for both week day and week end
+
+```{r echo = TRUE}
+mSteps_wkDay <- Dat %>%
+    filter(Weekend == FALSE) %>%
+    group_by(interval) %>%
+    summarise_at(vars(steps), list(meanSteps = mean), na.rm = TRUE)
+meanSteps_wkDay <- as.data.frame(mSteps_wkDay)
+head(meanSteps_wkDay)
+mSteps_wkEnd <- Dat %>%
+    filter(Weekend == TRUE) %>%
+    group_by(interval) %>%
+    summarise_at(vars(steps), list(meanSteps = mean), na.rm = TRUE)
+meanSteps_wkEnd <- as.data.frame(mSteps_wkEnd)
+head(meanSteps_wkEnd)
+
+```
+
+- Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
+
+```{r echo = TRUE, fig.width = 10}
+rng <- range(meanSteps_wkDay$meanSteps, meanSteps_wkEnd$meanSteps)
+par(mfrow = c(1, 2))
+with(meanSteps_wkDay, plot(x = interval, y = meanSteps, type = "l", ylim = rng, 
+                           xlab = "5-minute interval", ylab = "Average number of steps", 
+                           main = "Average daily activity pattern in week day"))
+with(meanSteps_wkEnd, plot(x = interval, y = meanSteps, type = "l", ylim = rng, 
+                           xlab = "5-minute interval", ylab = "Average number of steps", 
+                           main = "Average daily activity pattern in week end"))
+
+```
+
+
 
 
 
