@@ -1,0 +1,33 @@
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
+
+
+## Loading and preprocessing the data
+```{r readProcData, echo = TRUE}
+tPath <- "D:/00-OneDrive/GitHub/RepData_PeerAssessment1"
+setwd(tPath)
+master <- as.character(unzip("activity.zip", list = TRUE)$Name)
+Dat <- read.csv(unz("activity.zip", "activity.csv"), header = TRUE, sep = ",") 
+dim(Dat)
+head(Dat)
+Dat$date <- as.Date(Dat$date, "%Y-%m-%d")
+str(Dat)
+
+```
+## What is mean total number of steps taken per day?
+
+
+
+## What is the average daily activity pattern?
+
+
+
+## Imputing missing values
+
+
+
+## Are there differences in activity patterns between weekdays and weekends?
